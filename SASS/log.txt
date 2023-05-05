@@ -1,0 +1,83 @@
+1. npm init -y
+
+2. npm install gulp gulp-sass sass --save-dev
+    install package yang digunakan hanya untuk development (--save-dev) (-D) maka saat produksi package ini tidak digunakan
+
+3. npm install -g gulp
+    install package secara global (--global) (-g) agar dapat dijalankan pada cmd
+
+4. ketik file seperti gulpfile.js
+    buat file gulpfile.js untuk menjalankan cmd gulp
+
+5. buat file dengan ekstensi .scss
+    buat file ekstensi .scss untuk mengetik file SASS lalu akan di ubah menjadi .css oleh gulp
+
+6. variable dalam SASS menggunakan $ pada awal variable
+    contoh:
+        $color: red;
+        $margin: 20px;
+
+7. file .scss dengan _ diawal nama file maka tidak akan diubah menjadi file .css
+
+8. gunakan @import pada scss untuk import file
+
+9. src('scss/**/*.scss')
+    dibaca:
+        folder scss
+        ** semua sub folder
+        * semua file
+        .scss dengan ekstensi scss
+
+10. nested css
+    CSS:
+        .card {
+            background: black;
+        }
+        .card p {
+            color: white;
+        }
+    SCSS:
+        .card {
+            background: black;
+
+            p {
+                color: white;
+            }
+        }
+
+11. Math di variable
+    $var1 = 2px;
+    $var2 = $var2 * 5;
+    maka 
+    $var2 = 10px;
+
+12. Math di style
+    menggunakan Math dari sass
+    @use 'sass:math';
+    property: Math.function(4px, 2);
+    contoh:
+        padding: Math.div(4px, 2);
+        maka
+        padding: 2px;
+    // https://sass-lang.com/documentation/modules/math
+
+13. debug
+    @debug 'Text';
+    @debug Math.function(3, 5)
+
+14. maps
+    menyimpan beberapa variable dalam 1 variable
+    dapat mengambil salah satu variable dengan cara map-get($maps, "nama_var")
+
+15. loop
+    dapat melakukan perulangan dari maps menggunakan @each pada file _color.scss atau @for
+    dapat membuat property css sesuai nama variable dengan cara .property-#{$variable} {}
+
+16. if else
+
+17. parent selector
+    // https://ishadeed.com/article/css-has-parent-selector/
+
+18. mixin @include
+
+19. function

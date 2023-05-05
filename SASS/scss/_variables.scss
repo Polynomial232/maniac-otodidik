@@ -1,0 +1,44 @@
+// == Variables ==
+
+// colors
+$primary: #326dee;
+$secondary: #1ac888;
+$error: #d32752;
+$info: #f6c31c;
+$card-color: #f1e9e9;
+
+// spacings
+$base-padding: 0.75rem;
+$base-margin: 0.75rem;
+
+// borders
+$base-border-thickness: 1px;
+$base-border-radius: 20px;
+
+// font size
+$base-font-size: 1rem;
+$font-size-sm: $base-font-size * 0.75;
+$font-size-lg: $base-font-size * 1.5;
+$font-size-xl: $base-font-size * 2;
+$font-size-xxl: $base-font-size * 3;
+
+// color palette
+$colors: (
+    "primary": $primary,
+    "secondary": $secondary,
+    "error": $error,
+    "info": $info,
+    "blue": #2981ce,
+    "white": white,
+    "black": black,
+);
+
+.btn-test {
+    background-color: map-get($colors, "info");
+}
+
+// @debug map-get($colors, "blue");
+// @debug map-has-key($colors, "primary");
+// @debug map-has-key($colors, "bluez");
+// @debug map-remove($colors, "primary");
+// @debug map-merge($colors, ("pink": #ffc0cb))
