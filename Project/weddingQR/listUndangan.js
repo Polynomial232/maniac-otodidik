@@ -1,0 +1,3 @@
+listUndangan = []
+
+module.exports = listUndangan
