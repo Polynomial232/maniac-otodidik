@@ -19,4 +19,4 @@ const init = async () => {
     console.log(`server running: ${server.info.uri}`)
 }
 
-init()
+module.exports = { init }
