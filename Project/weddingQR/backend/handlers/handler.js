@@ -1,10 +1,23 @@
 const { nanoid } = require('nanoid')
-const listUndangan = require('./listUndangan')
+const listUndangan = require('../listUndangan')
+const { 
+    findIndex, 
+    writeJson, 
+    isSuccess 
+} = require('./functionHandler')
 const { 
     generateQrImage, 
     deleteQrImage,
     getQrImagePath
- } = require('./qrHandler')
+} = require('./qrHandler')
+
+
+const rootHandler = (request, h) => {
+    const response = h.response({
+        status: "success"
+    }).code(200)
+    return response
+}
 
 const addUndanganHandler = (request, h) => {
     const {
@@ -19,20 +32,19 @@ const addUndanganHandler = (request, h) => {
     const qrCode = nanoid(32)
     const insertedAt = new Date().toISOString()
     const updatedAt = insertedAt
+    const deleteAt = ''
 
     if(nama == null){
         const response = h.response({
             status: 'fail',
             message: 'Nama yang diundang harus diisi'
-        })
-        response.code(400)
+        }).code(400)
         return response
     }else if(kenalan == null){
         const response = h.response({
             status: 'fail',
             message: 'Kenalan dari yang diundang harus diisi'
-        })
-        response.code(400)
+        }).code(400)
         return response
     }
     
@@ -45,16 +57,14 @@ const addUndanganHandler = (request, h) => {
         ttd,
         tglDatang,
         insertedAt,
-        updatedAt
+        updatedAt,
+        deleteAt
     }
 
     listUndangan.push(newUndangan)
+    writeJson(listUndangan)
 
-    const isSuccess = listUndangan.filter((undangan) => {
-        undangan.id == id.length > 0
-    })
-
-    if(isSuccess) {
+    if(isSuccess(listUndangan, id)) {
         generateQrImage(qrCode)
         const response = h.response({
             status: 'success',
@@ -62,8 +72,7 @@ const addUndanganHandler = (request, h) => {
             data: {
                 undanganId: id
             }
-        })
-        response.code(201)
+        }).code(201)
         return response
     }
 }
@@ -78,34 +87,70 @@ const listUndanganHandler = (request, h) => {
     const response = h.response({
         status: 'success',
         data: listUndangan
-    })
-    response.code(200)
+    }).code(200)
+    return response
+}
+
+const undanganHandler = (request, h) => {
+    const { id } = request.params
+    const index = findIndex(listUndangan, id)
+
+    if(index == -1){
+        const response = h.response({
+            status: 'fail',
+            message: 'Id tidak ditemukan'
+        }).code(404)
+        return response
+    }
+
+    const response = h.response(listUndangan[index]).code(200)
+    return response
+}
+
+const editUndanganHandler = (request, h) => {
+    const { id } = request.params
+    const {
+        nama,
+        kenalan,
+        foto,
+        ttd,
+        tglDatang,
+    } = request.payload
+    const index = findIndex(listUndangan, id)
+    if(index == -1){
+        const response = h.response({
+            status: 'fail',
+            message: 'Undangan gagal diedit. Id tidak ditemukan'
+        }).code(404)
+        return response
+    }
+
+    const response = h.response({
+        status: 'success',
+        message: 'Undangan berhasil diedit'
+    }).code(404)
     return response
 }
 
 const deleteUndanganHandler = (request, h) => {
     const { id } = request.params
-
-    const index = listUndangan.findIndex(
-        (undangan) => undangan.id === id
-    )
+    const index = findIndex(listUndangan, id)
 
     if(index !== -1) {
         deleteQrImage(listUndangan[index].qrCode)
         listUndangan.splice(index, 1)
+        writeJson(listUndangan)
         const response = h.response({
             status: 'success',
             message: 'Undangan berhasil dihapus'
-        })
-        response.code(200)
+        }).code(200)
         return response
     }
 
     const response = h.response({
         status: 'fail',
         message: 'Undangan gagal dihapus. Id tidak ditemukan'
-    })
-    response.code(404)
+    }).code(404)
     return response
 }
 
@@ -118,22 +163,22 @@ const qrViewHandler = (request, h) => {
 
     if(index !== -1) {
         const qrPath = getQrImagePath(listUndangan[index].qrCode)
-        console.log(qrPath)
-        // return h.file(qrPath);
         return qrPath;
     }
 
     const response = h.response({
         status: 'fail',
         message: 'Undangan gagal dihapus. Id tidak ditemukan'
-    })
-    response.code(404)
+    }).code(404)
     return response
 }
 
 module.exports = { 
+    rootHandler,
     addUndanganHandler, 
     listUndanganHandler,
+    undanganHandler,
+    editUndanganHandler,
     deleteUndanganHandler,
     qrViewHandler
 }

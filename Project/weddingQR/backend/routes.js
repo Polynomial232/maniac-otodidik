@@ -1,11 +1,19 @@
 const { 
+    rootHandler,
     addUndanganHandler, 
-    listUndanganHandler, 
+    listUndanganHandler,
+    undanganHandler,
+    editUndanganHandler,
     deleteUndanganHandler,
     qrViewHandler
-} = require('./handler')
+} = require('./handlers/handler')
 
 const routes = [
+    {
+        method: 'GET',
+        path: '/',
+        handler: rootHandler
+    },
     {
         method: 'POST',
         path: '/undangan',
@@ -15,6 +23,16 @@ const routes = [
         method: 'GET',
         path: '/undangan',
         handler: listUndanganHandler
+    },
+    {
+        method: 'GET',
+        path: '/undangan/{id}',
+        handler: undanganHandler
+    },
+    {
+        method: 'PUT',
+        path: '/undangan/{id}',
+        handler: editUndanganHandler
     },
     {
         method: 'DELETE',
