@@ -5,7 +5,9 @@ const {
     undanganHandler,
     editUndanganHandler,
     deleteUndanganHandler,
-    qrViewHandler
+    softDeleteUndaganHandler,
+    qrViewHandler,
+    readQr
 } = require('./handlers/handler')
 
 const routes = [
@@ -40,10 +42,20 @@ const routes = [
         handler: deleteUndanganHandler
     },
     {
+        method: 'DELETE',
+        path: '/undangan/{id}/soft',
+        handler: softDeleteUndaganHandler
+    },
+    {
         method: 'GET',
         path: '/undangan/{id}/qr',
         handler: qrViewHandler
     },
+    {
+        method: 'GET',
+        path: '/read-qr/{qrCode}',
+        handler: readQr
+    }
 ]
 
 

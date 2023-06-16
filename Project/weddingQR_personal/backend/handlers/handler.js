@@ -2,19 +2,21 @@ const { nanoid } = require('nanoid')
 const listUndangan = require('../listUndangan')
 const { 
     findIndex, 
+    findIndexByQr,
     writeJson, 
-    isSuccess 
+    isDataAdded,
+    undefinedToNull
 } = require('./functionHandler')
 const { 
     generateQrImage, 
     deleteQrImage,
     getQrImagePath
 } = require('./qrHandler')
-
+const mapUrl = require('./gotoMapHandler')
 
 const rootHandler = (request, h) => {
     const response = h.response({
-        status: "success"
+        status: "hi"
     }).code(200)
     return response
 }
@@ -32,15 +34,15 @@ const addUndanganHandler = (request, h) => {
     const qrCode = nanoid(32)
     const insertedAt = new Date().toISOString()
     const updatedAt = insertedAt
-    const deleteAt = ''
+    const deleteAt = undefined
 
-    if(nama == null){
+    if(nama == undefined){
         const response = h.response({
             status: 'fail',
             message: 'Nama yang diundang harus diisi'
         }).code(400)
         return response
-    }else if(kenalan == null){
+    }else if(kenalan == undefined){
         const response = h.response({
             status: 'fail',
             message: 'Kenalan dari yang diundang harus diisi'
@@ -48,7 +50,7 @@ const addUndanganHandler = (request, h) => {
         return response
     }
     
-    const newUndangan = {
+    let undangan = {
         id,
         qrCode,
         nama,
@@ -60,11 +62,12 @@ const addUndanganHandler = (request, h) => {
         updatedAt,
         deleteAt
     }
+    undangan = undefinedToNull(undangan)
 
-    listUndangan.push(newUndangan)
+    listUndangan.push(undangan)
     writeJson(listUndangan)
 
-    if(isSuccess(listUndangan, id)) {
+    if(isDataAdded(listUndangan, id)) {
         generateQrImage(qrCode)
         const response = h.response({
             status: 'success',
@@ -78,15 +81,13 @@ const addUndanganHandler = (request, h) => {
 }
 
 const listUndanganHandler = (request, h) => {
-    listUndangan.map((undangan) => {
-        for(const key in undangan){
-            undangan[key] = undangan[key] == undefined ? null:undangan[key]
-        }
-    })
+    const { content } = request.query
+    const newListUndangan = content === 'all' ?
+        listUndangan:listUndangan.filter((undangan) => undangan.deleteAt == null)
 
     const response = h.response({
         status: 'success',
-        data: listUndangan
+        data: newListUndangan
     }).code(200)
     return response
 }
@@ -117,6 +118,7 @@ const editUndanganHandler = (request, h) => {
         tglDatang,
     } = request.payload
     const index = findIndex(listUndangan, id)
+    
     if(index == -1){
         const response = h.response({
             status: 'fail',
@@ -125,9 +127,47 @@ const editUndanganHandler = (request, h) => {
         return response
     }
 
+    listUndangan[index] = {
+        ...listUndangan[index],
+        nama,
+        kenalan,
+        foto,
+        ttd,
+        tglDatang
+    }
+    listUndangan[index] = undefinedToNull(listUndangan[index])
+    writeJson(listUndangan)
+
+    message = listUndangan[index].deleteAt == null ?
+        'Undangan berhasil diedit':'Undangan yang sudah dihapus berhasil diedit'
     const response = h.response({
         status: 'success',
-        message: 'Undangan berhasil diedit'
+        message: message
+    }).code(200)
+    return response
+}
+
+const softDeleteUndaganHandler = (request, h) => {
+    const { id } = request.params
+    const index = findIndex(listUndangan, id)
+    const deleteAt = new Date().toISOString()
+
+    if(index !== -1){
+        listUndangan[index] = {
+            ...listUndangan[index],
+            deleteAt
+        }
+        writeJson(listUndangan)
+        const response = h.response({
+            status: 'success',
+            message: 'Undangan berhasil dihapus secara soft'
+        }).code(200)
+        return response
+    }
+
+    const response = h.response({
+        status: 'fail',
+        message: 'Undangan gagal dihapus secara soft. Id tidak ditemukan'
     }).code(404)
     return response
 }
@@ -140,6 +180,7 @@ const deleteUndanganHandler = (request, h) => {
         deleteQrImage(listUndangan[index].qrCode)
         listUndangan.splice(index, 1)
         writeJson(listUndangan)
+
         const response = h.response({
             status: 'success',
             message: 'Undangan berhasil dihapus'
@@ -156,21 +197,35 @@ const deleteUndanganHandler = (request, h) => {
 
 const qrViewHandler = (request, h) => {
     const { id } = request.params
-
-    const index = listUndangan.findIndex(
-        (undangan) => undangan.id === id
-    )
+    const index = findIndex(listUndangan, id)
 
     if(index !== -1) {
         const qrPath = getQrImagePath(listUndangan[index].qrCode)
-        return qrPath;
+        return h.file(qrPath)
     }
 
     const response = h.response({
         status: 'fail',
-        message: 'Undangan gagal dihapus. Id tidak ditemukan'
+        message: 'QR tidak ditemukan.'
     }).code(404)
     return response
+}
+
+const readQr = (request, h) => {
+    const { qrCode } = request.params
+    const { type } = request.query
+
+    if(type == 'scan'){
+        const index = findIndexByQr(listUndangan, qrCode)
+
+        const response = h.response({
+            status: 'success',
+            message: 'Scan Berhasil',
+            detail: listUndangan[index]
+        }).code(200)
+        return response
+    }
+    return h.redirect(mapUrl)
 }
 
 module.exports = { 
@@ -180,5 +235,7 @@ module.exports = {
     undanganHandler,
     editUndanganHandler,
     deleteUndanganHandler,
-    qrViewHandler
+    softDeleteUndaganHandler,
+    qrViewHandler,
+    readQr
 }

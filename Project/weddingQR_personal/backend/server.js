@@ -12,6 +12,8 @@ const init = async () => {
         }
     })
 
+    await server.register(require('@hapi/inert'))
+
     server.route(routes)
 
     await server.start()
