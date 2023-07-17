@@ -1,5 +1,5 @@
 const express = require("express")
-const usersRouter = express.Router()
+const usersRoute = express.Router()
 
 const {
     usersHandler,
@@ -7,13 +7,13 @@ const {
     addUsersHandler,
     editUserIdHandler,
     deleteUserIdHandler,
-} = require("../handlers/usersHandler.handler")
+} = require("../../handlers/usersHandler.handler")
 
-usersRouter.route("/users").get(usersHandler).post(addUsersHandler)
-usersRouter
+usersRoute.route("/users").get(usersHandler).post(addUsersHandler)
+usersRoute
     .route("/users/:id")
     .get(usersIdHandler)
     .put(editUserIdHandler)
     .delete(deleteUserIdHandler)
 
-module.exports = usersRouter
+module.exports = usersRoute

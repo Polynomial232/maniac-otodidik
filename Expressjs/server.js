@@ -2,22 +2,23 @@ const express = require("express")
 const bodyParser = require("body-parser")
 const path = require("path")
 
+const dbConnection = require("./app/config/db.config")
+const router = require("./app/routes")
+const middlewares = require("./app/middlewares/app.middleware")
+
 const app = express()
 const port = 9000
 
-const usersRouter = require("./app/routes/users.route")
-const rootRouter = require("./app/routes/route.route")
-const templateRoute = require("./app/routes/template.route")
-const middleware = require("./app/middleware/app.middleware")
+dbConnection()
 
 app.use([bodyParser.json(), bodyParser.urlencoded({ extended: false })])
 
-app.use(middleware)
+app.use(middlewares)
 
 app.set("views", path.join(__dirname, "app/views"))
 app.set("view engine", "ejs")
 
-app.use([rootRouter, usersRouter, templateRoute])
+app.use(router)
 
 app.listen(port, () => {
     console.log(`App Listening on port ${port}`)

@@ -1,39 +1,53 @@
-const { v4: uuidv4 } = require("uuid")
+const User = require("../models/user.model")
 
-const users = require("../datas/users")
+async function usersHandler(request, response) {
+    try {
+        const users = await User.find()
 
-const usersHandler = (request, response) => {
-    return users.length < 1
-        ? response.status(202).json({
-              data: "Kosong",
-          })
-        : response.status(202).json({
-              data: users,
-              method: request.method,
-              url: request.url,
-          })
-}
-const usersIdHandler = (request, response) => {
-    const id = request.params.id
-    const index = users.findIndex((user) => user.id == id)
-
-    return index == -1
-        ? response.status(404).json({
-              data: "Kosong",
-          })
-        : response.status(202).json({
-              data: users[index],
-              method: request.method,
-              url: request.url,
-          })
-}
-const addUsersHandler = (request, response) => {
-    const { name } = request.body
-    const user = {
-        id: uuidv4(),
-        name,
+        return response.status(202).json({
+            data: users,
+            method: request.method,
+            url: request.url,
+        })
+    } catch (err) {
+        return response.status(202).json({
+            data: "Kosong",
+        })
     }
-    users.push(user)
+}
+
+async function usersIdHandler(request, response) {
+    const id = request.params.id
+
+    try {
+        const result = await User.findById(id)
+        if (result === null) {
+            return response.status(404).json({
+                data: "Data tersebut sudah terhapus",
+            })
+        }
+
+        return response.status(202).json({
+            data: result,
+            method: request.method,
+            url: request.url,
+        })
+    } catch (err) {
+        return response.status(404).json({
+            data: "Kosong",
+        })
+    }
+}
+
+async function addUsersHandler(request, response) {
+    const { name, email, password } = request.body
+
+    const user = new User({
+        name,
+        email,
+        password,
+    })
+    await user.save()
 
     return response.status(202).json({
         data: user,
@@ -41,41 +55,50 @@ const addUsersHandler = (request, response) => {
         url: request.url,
     })
 }
+
 const editUserIdHandler = (request, response) => {
     const id = request.params.id
-    const { name } = request.body
-    const index = users.findIndex((user) => user.id == id)
+    const { name, email, password } = request.body
 
-    if (index === -1)
+    try {
+        const result = User.findByIdAndUpdate(id, {
+            name,
+        })
+
+        console.log(result)
+        return response.status(202).json({
+            data: result,
+            method: request.method,
+            url: request.url,
+        })
+    } catch (err) {
+        console.log(err)
         return response.status(404).json({
             data: "Kosong",
         })
-
-    users[index] = {
-        ...users[index],
-        name,
     }
-    return response.status(202).json({
-        data: request.body,
-        method: request.method,
-        url: request.url,
-    })
 }
-const deleteUserIdHandler = (request, response) => {
+async function deleteUserIdHandler(request, response) {
     const id = request.params.id
-    const index = users.findIndex((user) => user.id == id)
 
-    if (index === -1)
+    try {
+        const result = await User.findByIdAndDelete(id)
+        if (result === null) {
+            return response.status(404).json({
+                data: "Data tersebut sudah terhapus",
+            })
+        }
+
+        return response.status(202).json({
+            message: `Berhasil menghapus id: ${id}`,
+            method: request.method,
+            url: request.url,
+        })
+    } catch (err) {
         return response.status(404).json({
             data: "Kosong",
         })
-
-    users.splice(index)
-    return response.status(202).json({
-        data: `Berhasil menghapus id: ${id}`,
-        method: request.method,
-        url: request.url,
-    })
+    }
 }
 
 module.exports = {
