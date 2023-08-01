@@ -2,10 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* #root {
-    max-height: 100vh;
-    overflow-y: hidden;
-} */
+@font-face {
+    font-family: "Gelion-Medium";
+    src: local("Gelion-Medium"),
+        url("./assets/fonts/Gelion-Medium.woff") format("truetype");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Gelion-Regular";
+    src: local("Gelion-Regular"),
+        url("./assets/fonts/Gelion-Regular.woff") format("truetype");
+    font-weight: bold;
+}
+
+#root {
+    @apply p-4;
+    font-family: "Gelion-Regular";
+}
+
+.font-gel-medium {
+    font-family: "Gelion-Medium";
+}
 
 h1,
 h2 {

@@ -1,12 +1,40 @@
 import React from "react"
+import { AiOutlinePlus } from "react-icons/ai"
 
 export function TagsSidebar(props) {
+    const tags = [
+        {
+            name: "Tag 1",
+            color: "#D1EAED",
+        },
+        {
+            name: "Tag 2",
+            color: "#FFDADA",
+        },
+    ]
+
     return (
         <>
-            <h2>Tags</h2>
-            <button className="btn btn-neutral">Tag 1</button>
-            <button className="btn btn-primary">Tag 2</button>
-            <button className="btn btn-accent">Tag 3</button>
+            <h2 className="text-fontPrimary text-[12px] text-opacity-80">
+                Tags
+            </h2>
+            <div className="flex gap-1 flex-wrap text-xs">
+                {tags.map((tag) => (
+                    <button
+                        className="px-2 py-[5px] rounded-md font-semibold"
+                        style={{ backgroundColor: tag.color }}
+                        key={tag.name}
+                    >
+                        {tag.name}
+                    </button>
+                ))}
+                <button
+                    className="flex justify-center items-center gap-2 px-3 py-[5px] rounded-md font-semibold"
+                    style={{ backgroundColor: "#EBEBEB" }}
+                >
+                    <AiOutlinePlus /> Add Tag
+                </button>
+            </div>
         </>
     )
 }

@@ -1,22 +1,23 @@
 import React from "react"
 import { AiOutlinePlus } from "react-icons/ai"
+import { NotificationSidebar } from "./notification.Sidebar"
 
 export function ListsSidebar(props) {
     const lists = [
         {
             color: "#FF6B6B",
             name: "Personal",
-            notif: 3,
+            notifications: 3,
         },
         {
             color: "#67D9E8",
             name: "Work",
-            notif: 6,
+            notifications: 6,
         },
         {
             color: "#FFD43B",
             name: "List 1",
-            notif: 3,
+            notifications: 3,
         },
     ]
     return (
@@ -24,27 +25,25 @@ export function ListsSidebar(props) {
             <h2 className="text-fontPrimary text-[12px] text-opacity-80">
                 Lists
             </h2>
-            <ul className="font-normal">
+            <ul className="font-normal text-sm">
                 {lists.map((list) => (
                     <li
-                        className="grid grid-cols-3 justify-start items-center p-2 rounded-md hover:bg-[#EBEBEB] hover:cursor-pointer hover:font-semibold"
+                        className="grid grid-cols-3 justify-start items-center py-1 px-2 rounded-md hover:bg-[#EBEBEB] hover:cursor-pointer hover:font-semibold group"
                         key={list.name}
                     >
                         <div className="col-span-2 flex items-center gap-2">
                             <span
-                                className="w-5 h-5 rounded-md"
+                                className="w-3 h-3 rounded-sm"
                                 style={{ background: list.color }}
                             ></span>
                             {list.name}
                         </div>
-                        {list.notif ? (
-                            <span className="justify-self-end bg-[#FAFAFA] text-[11px] w-7 text-center font-bold py-1 rounded-md">
-                                {list.notif}
-                            </span>
+                        {list.notifications ? (
+                            <NotificationSidebar len={list.notifications} />
                         ) : null}
                     </li>
                 ))}
-                <li className="flex items-center p-2 rounded-md hover:bg-[#EBEBEB] hover:cursor-pointer gap-3  hover:font-semibold">
+                <li className="flex items-center py-1 px-2 rounded-md hover:bg-[#EBEBEB] hover:cursor-pointer gap-3  hover:font-semibold">
                     <AiOutlinePlus /> Add New List
                 </li>
             </ul>
