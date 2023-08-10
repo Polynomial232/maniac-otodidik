@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block start %}
+    <h2>Home {{ page }}</h2>d
+    <ul>
+        {% for user in users %}
+            <li>
+                {{forloop.counter}}. {{user.name}} age: {{user.age}} legal: {% if user.age >= 17%} True {% else %} False {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <p>{{text}}</p>
+
+    {% endblock%}
